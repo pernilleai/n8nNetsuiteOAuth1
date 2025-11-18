@@ -281,6 +281,12 @@ export class NetsuiteRest implements INodeType {
 					},
 				],
 			},
+			{
+				displayName: 'Created by pernille-ai.com',
+				name: 'attribution',
+				type: 'notice',
+				default: '',
+			},
 		],
 	};
 

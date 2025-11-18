@@ -97,15 +97,16 @@ You need your NetSuite Account ID and Realm for authentication.
    - Copy the **full Account ID including any prefix**
 
 2. **Find Your Realm**
-   - The **Realm** is your account number (the numeric portion)
-   - For production accounts: Just the number (e.g., `1234567`)
-   - For sandbox accounts: Number with underscore and sandbox ID (e.g., `1234567_SB1`, `1234567_SB2`)
-   - ⚠️ **IMPORTANT**: Use **underscores** (_), NOT hyphens (-) in sandbox realm IDs
+   - The **Realm** is your account number
+   - ⚠️ **IMPORTANT**: NetSuite displays account IDs with **hyphens** in URLs, but the OAuth realm requires **underscores**
+     - In NetSuite URLs: `1234567-SB1` (with hyphen)
+     - In OAuth realm: `1234567_SB1` (with underscore)
      - ✅ Correct: `1234567_SB1`
      - ❌ Wrong: `1234567-SB1`
-   - You can also find this in your NetSuite URL:
-     - Production: `https://1234567.app.netsuite.com` → Realm: `1234567`
-     - Sandbox: `https://1234567-sb1.app.netsuite.com` → Realm: `1234567_SB1`
+   - Examples from NetSuite URLs:
+     - Production: `https://1234567.app.netsuite.com` → Realm: `1234567` (no hyphen, no conversion needed)
+     - Sandbox: `https://1234567-sb1.app.netsuite.com` → Realm: `1234567_SB1` (convert hyphen to underscore)
+   - **Rule**: Convert any hyphens you see in the account ID to underscores for the realm parameter
 
 **Summary of Credentials Collected:**
 - ✅ Consumer Key (from Integration Record)
@@ -166,7 +167,8 @@ define(['N/log'], (log) => {
 3. **Create the Script Record**
    - NetSuite should auto-detect the script type as "Restlet"
    - **Name**: Enter a descriptive name (e.g., "n8n RESTlet" or "Workflow Integration RESTlet")
-   - **ID**: NetSuite will auto-generate this (e.g., `customscript_n8n_restlet`)
+   - **ID**: NetSuite will auto-generate this
+     - Can be a custom string (e.g., `customscript_n8n_restlet`) or numeric (e.g., `1369`)
      - ✅ **Copy and save this Script ID** - you'll need it for n8n
    - **Description**: Optional description of what this RESTlet does
    - **Owner**: Select yourself or the appropriate owner
@@ -182,7 +184,8 @@ After creating the script, you must deploy it to make it accessible.
 
 2. **Configure the Deployment**
    - **Title**: Enter a descriptive name (e.g., "n8n Production Deployment")
-   - **ID**: NetSuite will auto-generate this (e.g., `customdeploy_n8n_restlet`)
+   - **ID**: NetSuite will auto-generate this
+     - Can be a custom string (e.g., `customdeploy_n8n_restlet`) or numeric (e.g., `1`)
      - ✅ **Copy and save this Deploy ID** - you'll need it for n8n
    - **Status**: Select **Released** (must be released to be accessible)
    - **Log Level**: Choose **Debug** for initial testing, **Error** for production
@@ -196,8 +199,8 @@ After creating the script, you must deploy it to make it accessible.
    - Your RESTlet is now deployed and accessible via OAuth1 authentication
 
 4. **Note Your Script Details**
-   - ✅ **Script ID**: (e.g., `customscript_n8n_restlet`)
-   - ✅ **Deploy ID**: (e.g., `customdeploy_n8n_restlet`)
+   - ✅ **Script ID**: Can be custom string (e.g., `customscript_n8n_restlet`) or numeric (e.g., `1369`)
+   - ✅ **Deploy ID**: Can be custom string (e.g., `customdeploy_n8n_restlet`) or numeric (e.g., `1`)
    - You can always find these by navigating back to the script record
 
 **Important Notes:**
@@ -249,13 +252,13 @@ After completing the above steps, you should have:
 | Credential Field | Example Value | Where to Find |
 |------------------|---------------|---------------|
 | **Account ID** | `TSTDRV1234567` | Setup > Company > Company Information |
-| **Realm** | `1234567_SB1` | Derived from Account ID (use underscores for sandbox) |
+| **Realm** | `1234567_SB1` | Derived from Account ID (convert any hyphens to underscores) |
 | **Consumer Key** | `abc123...` | From Integration Record (Step 1) |
 | **Consumer Secret** | `xyz789...` | From Integration Record (Step 1) |
 | **Token ID** | `def456...` | From Access Token (Step 2) |
 | **Token Secret** | `ghi012...` | From Access Token (Step 2) |
-| **Script ID** | `customscript_n8n_restlet` | From Script Record (Step 4) |
-| **Deploy ID** | `customdeploy_n8n_restlet` | From Script Deployment (Step 5) |
+| **Script ID** | `customscript_n8n_restlet` or `1369` | From Script Record (Step 4) |
+| **Deploy ID** | `customdeploy_n8n_restlet` or `1` | From Script Deployment (Step 5) |
 
 You'll enter all of these values when configuring the **Netsuite OAuth1 API** credentials in n8n.
 
@@ -267,15 +270,15 @@ You'll enter all of these values when configuring the **Netsuite OAuth1 API** cr
 
 1. In n8n, go to **Credentials** (in the left sidebar)
 2. Click **Add Credential** and search for **Netsuite OAuth1 API**
-3. Fill in all 8 fields with the values you collected above:
+3. Fill in the fields with the values you collected above:
    - Account ID
-   - Realm (remember: use underscores for sandbox accounts)
+   - Realm (remember: convert any hyphens from the account ID to underscores)
    - Consumer Key
    - Consumer Secret
    - Token ID
    - Token Secret
-   - Script ID
-   - Deploy ID
+   - Script ID (only required if using the RESTlet node)
+   - Deploy ID (only required if using the RESTlet node)
 4. Click **Save** or **Create**
 
 ### Step 2: Use the Node in a Workflow
@@ -478,10 +481,10 @@ For a complete list, refer to the [NetSuite Records Browser](https://system.nets
 ### Common Issues
 
 1. **Authentication Failed / 401 Unauthorized**
-   - Verify all 8 credential fields are correct
+   - Verify all credential fields are correct
    - Check that the Access Token is not revoked
    - Ensure the user/role has Web Services permission
-   - Verify the realm uses underscores (not hyphens) for sandbox accounts
+   - Verify the realm parameter has underscores (not hyphens) - convert any hyphens from account ID
 
 2. **RESTlet Not Found / 404 Error**
    - Verify Script ID and Deploy ID are correct
@@ -498,9 +501,10 @@ For a complete list, refer to the [NetSuite Records Browser](https://system.nets
    - Review error messages and stack traces
 
 5. **Realm Parameter Issues**
-   - Sandbox accounts must use underscores: `1234567_SB1` (not `1234567-SB1`)
-   - This node automatically converts hyphens to underscores for safety
-   - If you're unsure, check your NetSuite URL
+   - The realm parameter must use underscores: `1234567_SB1` (not `1234567-SB1`)
+   - NetSuite displays account IDs with hyphens in URLs, but OAuth requires underscores
+   - This node automatically converts any hyphens to underscores for safety
+   - If you're unsure, check your NetSuite URL and convert any hyphens to underscores
 
 ### Testing Your RESTlet
 
