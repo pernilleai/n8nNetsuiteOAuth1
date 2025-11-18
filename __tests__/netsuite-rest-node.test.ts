@@ -502,4 +502,14 @@ describe('NetSuite REST API Node', () => {
 			expect(field?.placeholder).toContain('Transformed from Sales Order');
 		});
 	});
+
+	describe('Attribution', () => {
+		it('should have attribution notice', () => {
+			const attributionField = netsuiteRestNode.description.properties.find(p => p.name === 'attribution');
+
+			expect(attributionField).toBeDefined();
+			expect(attributionField?.displayName).toBe('Created by pernille-ai.com');
+			expect(attributionField?.type).toBe('notice');
+		});
+	});
 });
