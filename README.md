@@ -167,7 +167,8 @@ define(['N/log'], (log) => {
 3. **Create the Script Record**
    - NetSuite should auto-detect the script type as "Restlet"
    - **Name**: Enter a descriptive name (e.g., "n8n RESTlet" or "Workflow Integration RESTlet")
-   - **ID**: NetSuite will auto-generate this (e.g., `customscript_n8n_restlet`)
+   - **ID**: NetSuite will auto-generate this
+     - Can be a custom string (e.g., `customscript_n8n_restlet`) or numeric (e.g., `1369`)
      - ✅ **Copy and save this Script ID** - you'll need it for n8n
    - **Description**: Optional description of what this RESTlet does
    - **Owner**: Select yourself or the appropriate owner
@@ -183,7 +184,8 @@ After creating the script, you must deploy it to make it accessible.
 
 2. **Configure the Deployment**
    - **Title**: Enter a descriptive name (e.g., "n8n Production Deployment")
-   - **ID**: NetSuite will auto-generate this (e.g., `customdeploy_n8n_restlet`)
+   - **ID**: NetSuite will auto-generate this
+     - Can be a custom string (e.g., `customdeploy_n8n_restlet`) or numeric (e.g., `1`)
      - ✅ **Copy and save this Deploy ID** - you'll need it for n8n
    - **Status**: Select **Released** (must be released to be accessible)
    - **Log Level**: Choose **Debug** for initial testing, **Error** for production
@@ -197,8 +199,8 @@ After creating the script, you must deploy it to make it accessible.
    - Your RESTlet is now deployed and accessible via OAuth1 authentication
 
 4. **Note Your Script Details**
-   - ✅ **Script ID**: (e.g., `customscript_n8n_restlet`)
-   - ✅ **Deploy ID**: (e.g., `customdeploy_n8n_restlet`)
+   - ✅ **Script ID**: Can be custom string (e.g., `customscript_n8n_restlet`) or numeric (e.g., `1369`)
+   - ✅ **Deploy ID**: Can be custom string (e.g., `customdeploy_n8n_restlet`) or numeric (e.g., `1`)
    - You can always find these by navigating back to the script record
 
 **Important Notes:**
@@ -255,8 +257,8 @@ After completing the above steps, you should have:
 | **Consumer Secret** | `xyz789...` | From Integration Record (Step 1) |
 | **Token ID** | `def456...` | From Access Token (Step 2) |
 | **Token Secret** | `ghi012...` | From Access Token (Step 2) |
-| **Script ID** | `customscript_n8n_restlet` | From Script Record (Step 4) |
-| **Deploy ID** | `customdeploy_n8n_restlet` | From Script Deployment (Step 5) |
+| **Script ID** | `customscript_n8n_restlet` or `1369` | From Script Record (Step 4) |
+| **Deploy ID** | `customdeploy_n8n_restlet` or `1` | From Script Deployment (Step 5) |
 
 You'll enter all of these values when configuring the **Netsuite OAuth1 API** credentials in n8n.
 

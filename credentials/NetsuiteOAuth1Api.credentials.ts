@@ -72,8 +72,8 @@ export class NetsuiteOAuth1Api implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: false,
-			placeholder: 'customscript_my_restlet',
-			description: 'The Script ID of your RESTlet script (only required for Netsuite RESTlet node)',
+			placeholder: 'customscript_my_restlet or 1369',
+			description: 'The Script ID of your RESTlet script - can be custom string (e.g., customscript_my_restlet) or numeric (e.g., 1369). Only required for Netsuite RESTlet node.',
 		},
 		{
 			displayName: 'Deploy ID',
@@ -81,8 +81,8 @@ export class NetsuiteOAuth1Api implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: false,
-			placeholder: 'customdeploy_my_restlet',
-			description: 'The Deploy ID of your RESTlet deployment (only required for Netsuite RESTlet node)',
+			placeholder: 'customdeploy_my_restlet or 1',
+			description: 'The Deploy ID of your RESTlet deployment - can be custom string (e.g., customdeploy_my_restlet) or numeric (e.g., 1). Only required for Netsuite RESTlet node.',
 		},
 	];
 
