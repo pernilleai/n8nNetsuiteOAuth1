@@ -1,0 +1,66 @@
+{
+  "name": "n8n-nodes-netsuite-oauth1",
+  "version": "1.0.0",
+  "description": "n8n node for Netsuite RESTlet with OAuth1 (TBA) authentication",
+  "keywords": [
+    "n8n-community-node-package",
+    "netsuite",
+    "oauth1",
+    "restlet"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/pernilleai/n8nNetsuiteOAuth1",
+  "author": {
+    "name": "Pernille AI",
+    "email": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pernilleai/n8nNetsuiteOAuth1.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "lint": "eslint --ext .ts .",
+    "lintfix": "eslint --ext .ts . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build && npm run lint"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/NetsuiteOAuth1Api.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Netsuite/Netsuite.node.js",
+      "dist/nodes/NetsuiteRest/NetsuiteRest.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.16.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "eslint": "^8.39.0",
+    "eslint-plugin-n8n-nodes-base": "^1.11.0",
+    "gulp": "^4.0.2",
+    "jest": "^29.5.0",
+    "n8n-workflow": "^1.0.0",
+    "prettier": "^2.8.8",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "oauth-1.0a": "^2.2.6"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
