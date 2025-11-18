@@ -5,7 +5,7 @@ import { NetsuiteRest } from '../nodes/NetsuiteRest/NetsuiteRest.node';
  *
  * These tests verify:
  * 1. Node metadata and configuration
- * 2. All 6 operations are properly defined
+ * 2. All 7 operations are properly defined
  * 3. Field configurations are correct
  * 4. Display options work correctly
  */
@@ -63,9 +63,9 @@ describe('NetSuite REST API Node', () => {
 			expect(operationField?.type).toBe('options');
 		});
 
-		it('should have 6 operations', () => {
+		it('should have 7 operations', () => {
 			const operationField = getOperationField();
-			expect(operationField?.options).toHaveLength(6);
+			expect(operationField?.options).toHaveLength(7);
 		});
 
 		it('should have Get Record operation', () => {
@@ -128,6 +128,16 @@ describe('NetSuite REST API Node', () => {
 			expect(searchOp.action).toBe('Search records');
 		});
 
+		it('should have Transform Record operation', () => {
+			const operationField = getOperationField();
+			const transformOp: any = operationField?.options?.find((op: any) => op.value === 'transform');
+
+			expect(transformOp).toBeDefined();
+			expect(transformOp.name).toBe('Transform Record');
+			expect(transformOp.description).toBe('Transform one record type to another (e.g., Sales Order to Invoice)');
+			expect(transformOp.action).toBe('Transform a record');
+		});
+
 		it('should have get as default operation', () => {
 			const operationField = getOperationField();
 			expect(operationField?.default).toBe('get');
@@ -145,10 +155,10 @@ describe('NetSuite REST API Node', () => {
 			expect(field?.placeholder).toBe('customer');
 		});
 
-		it('should hide Record Type field for search operation', () => {
+		it('should hide Record Type field for search and transform operations', () => {
 			const field = netsuiteRestNode.description.properties.find(p => p.name === 'recordType');
 
-			expect(field?.displayOptions?.hide?.operation).toEqual(['search']);
+			expect(field?.displayOptions?.hide?.operation).toEqual(['search', 'transform']);
 		});
 
 		it('should have Record ID field', () => {
@@ -217,6 +227,70 @@ describe('NetSuite REST API Node', () => {
 			const field = netsuiteRestNode.description.properties.find(p => p.name === 'suiteqlQuery');
 
 			expect(field?.displayOptions?.show?.operation).toEqual(['search']);
+		});
+
+		it('should have Source Record Type field', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordType');
+
+			expect(field).toBeDefined();
+			expect(field?.displayName).toBe('Source Record Type');
+			expect(field?.type).toBe('string');
+			expect(field?.required).toBe(true);
+			expect(field?.placeholder).toBe('salesorder');
+		});
+
+		it('should show Source Record Type only for transform operation', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordType');
+
+			expect(field?.displayOptions?.show?.operation).toEqual(['transform']);
+		});
+
+		it('should have Source Record ID field', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordId');
+
+			expect(field).toBeDefined();
+			expect(field?.displayName).toBe('Source Record ID');
+			expect(field?.type).toBe('string');
+			expect(field?.required).toBe(true);
+			expect(field?.placeholder).toBe('123');
+		});
+
+		it('should show Source Record ID only for transform operation', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordId');
+
+			expect(field?.displayOptions?.show?.operation).toEqual(['transform']);
+		});
+
+		it('should have Target Record Type field', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'targetRecordType');
+
+			expect(field).toBeDefined();
+			expect(field?.displayName).toBe('Target Record Type');
+			expect(field?.type).toBe('string');
+			expect(field?.required).toBe(true);
+			expect(field?.placeholder).toBe('invoice');
+		});
+
+		it('should show Target Record Type only for transform operation', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'targetRecordType');
+
+			expect(field?.displayOptions?.show?.operation).toEqual(['transform']);
+		});
+
+		it('should have Transform Data field', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'transformData');
+
+			expect(field).toBeDefined();
+			expect(field?.displayName).toBe('Transform Data');
+			expect(field?.type).toBe('string');
+			expect(field?.default).toBe('{}');
+			expect(field?.placeholder).toContain('memo');
+		});
+
+		it('should show Transform Data only for transform operation', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'transformData');
+
+			expect(field?.displayOptions?.show?.operation).toEqual(['transform']);
 		});
 	});
 
@@ -327,6 +401,12 @@ describe('NetSuite REST API Node', () => {
 			const searchOp = operations?.options?.find((op: any) => op.value === 'search');
 			expect(searchOp).toBeDefined();
 		});
+
+		it('should use POST method for transform operation', () => {
+			const operations = netsuiteRestNode.description.properties.find(p => p.name === 'operation');
+			const transformOp = operations?.options?.find((op: any) => op.value === 'transform');
+			expect(transformOp).toBeDefined();
+		});
 	});
 
 	describe('Required vs Optional Fields', () => {
@@ -399,6 +479,27 @@ describe('NetSuite REST API Node', () => {
 			const field = netsuiteRestNode.description.properties.find(p => p.name === 'suiteqlQuery');
 			expect(field?.placeholder).toContain('SELECT');
 			expect(field?.placeholder).toContain('FROM customer');
+		});
+
+		it('should have helpful placeholder for sourceRecordType', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordType');
+			expect(field?.placeholder).toBe('salesorder');
+		});
+
+		it('should have helpful placeholder for sourceRecordId', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'sourceRecordId');
+			expect(field?.placeholder).toBe('123');
+		});
+
+		it('should have helpful placeholder for targetRecordType', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'targetRecordType');
+			expect(field?.placeholder).toBe('invoice');
+		});
+
+		it('should have helpful placeholder for transformData', () => {
+			const field = netsuiteRestNode.description.properties.find(p => p.name === 'transformData');
+			expect(field?.placeholder).toContain('memo');
+			expect(field?.placeholder).toContain('Transformed from Sales Order');
 		});
 	});
 });

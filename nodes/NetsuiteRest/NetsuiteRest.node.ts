@@ -72,6 +72,12 @@ export class NetsuiteRest implements INodeType {
 						description: 'Query records using SuiteQL',
 						action: 'Search records',
 					},
+					{
+						name: 'Transform Record',
+						value: 'transform',
+						description: 'Transform one record type to another (e.g., Sales Order to Invoice)',
+						action: 'Transform a record',
+					},
 				],
 				default: 'get',
 			},
@@ -85,7 +91,49 @@ export class NetsuiteRest implements INodeType {
 				description: 'The NetSuite record type (e.g., customer, salesorder, invoice)',
 				displayOptions: {
 					hide: {
-						operation: ['search'],
+						operation: ['search', 'transform'],
+					},
+				},
+			},
+			{
+				displayName: 'Source Record Type',
+				name: 'sourceRecordType',
+				type: 'string',
+				default: '',
+				required: true,
+				placeholder: 'salesorder',
+				description: 'The source record type to transform from (e.g., salesorder, estimate)',
+				displayOptions: {
+					show: {
+						operation: ['transform'],
+					},
+				},
+			},
+			{
+				displayName: 'Source Record ID',
+				name: 'sourceRecordId',
+				type: 'string',
+				default: '',
+				required: true,
+				placeholder: '123',
+				description: 'The internal ID of the source record',
+				displayOptions: {
+					show: {
+						operation: ['transform'],
+					},
+				},
+			},
+			{
+				displayName: 'Target Record Type',
+				name: 'targetRecordType',
+				type: 'string',
+				default: '',
+				required: true,
+				placeholder: 'invoice',
+				description: 'The target record type to transform to (e.g., invoice, salesorder)',
+				displayOptions: {
+					show: {
+						operation: ['transform'],
 					},
 				},
 			},
@@ -142,6 +190,19 @@ export class NetsuiteRest implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['create', 'update', 'upsert'],
+					},
+				},
+			},
+			{
+				displayName: 'Transform Data',
+				name: 'transformData',
+				type: 'string',
+				default: '{}',
+				placeholder: '{"memo": "Transformed from Sales Order", "tranDate": "2025-01-15"}',
+				description: 'Optional JSON object with field values to override during transformation',
+				displayOptions: {
+					show: {
+						operation: ['transform'],
 					},
 				},
 			},
@@ -387,6 +448,27 @@ export class NetsuiteRest implements INodeType {
 						if (queryParams.length > 0) {
 							endpoint += `?${queryParams.join('&')}`;
 						}
+						break;
+					}
+
+					case 'transform': {
+						const sourceRecordType = this.getNodeParameter('sourceRecordType', i) as string;
+						const sourceRecordId = this.getNodeParameter('sourceRecordId', i) as string;
+						const targetRecordType = this.getNodeParameter('targetRecordType', i) as string;
+						const transformDataString = this.getNodeParameter('transformData', i, '{}') as string;
+
+						try {
+							body = JSON.parse(transformDataString);
+						} catch (error) {
+							throw new NodeOperationError(
+								this.getNode(),
+								`Invalid JSON in Transform Data: ${(error as Error).message}`,
+								{ itemIndex: i }
+							);
+						}
+
+						method = 'POST';
+						endpoint = `/record/v1/${sourceRecordType}/${sourceRecordId}/!transform/${targetRecordType}`;
 						break;
 					}
 
