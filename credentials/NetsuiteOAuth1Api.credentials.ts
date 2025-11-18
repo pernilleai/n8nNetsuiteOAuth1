@@ -25,8 +25,8 @@ export class NetsuiteOAuth1Api implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: true,
-			placeholder: '1234567',
-			description: 'Your NetSuite Realm/Account Number (numeric only)',
+			placeholder: '1234567_SB1',
+			description: 'Your NetSuite Realm/Account Number. Production: 1234567. Sandbox: 1234567_SB1 (use underscores, not hyphens).',
 		},
 		{
 			displayName: 'Consumer Key',

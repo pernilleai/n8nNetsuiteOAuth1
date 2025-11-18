@@ -102,7 +102,7 @@ define([], () => {
 When setting up the Netsuite OAuth1 API credentials in n8n, you'll need:
 
 1. **Account ID**: Your NetSuite account ID (e.g., `TSTDRV1234567`)
-2. **Realm**: Your NetSuite account number (numeric only, e.g., `1234567`)
+2. **Realm**: Your NetSuite account number. Production: `1234567`. Sandbox: `1234567_SB1` (use underscores, not hyphens)
 3. **Consumer Key**: From your Integration Record
 4. **Consumer Secret**: From your Integration Record
 5. **Token ID**: From your Access Token
@@ -113,7 +113,7 @@ When setting up the Netsuite OAuth1 API credentials in n8n, you'll need:
 ### Finding Your Account ID and Realm
 
 - **Account ID**: Found in **Setup > Company > Company Information** (the full account ID including any prefix)
-- **Realm**: The numeric portion of your account ID (for production) or found in the URL when logged into NetSuite
+- **Realm**: Your account number (production: `1234567`, sandbox: `1234567_SB1` with underscores). Found in your NetSuite URL or Company Information
 
 ## Operations
 

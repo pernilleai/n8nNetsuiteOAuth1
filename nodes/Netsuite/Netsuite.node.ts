@@ -110,7 +110,8 @@ export class Netsuite implements INodeType {
 					const credentials = await this.getCredentials('netsuiteOAuth1Api', i);
 
 					const accountId = credentials.accountId as string;
-					const realm = credentials.realm as string;
+					// Convert any hyphens to underscores in realm (NetSuite requires underscores)
+					const realm = (credentials.realm as string).replace(/-/g, '_');
 					const consumerKey = credentials.consumerKey as string;
 					const consumerSecret = credentials.consumerSecret as string;
 					const tokenId = credentials.tokenId as string;
