@@ -174,7 +174,24 @@ npm install
 npm run build
 ```
 
-### Testing
+### Running Tests
+
+This project includes comprehensive Jest tests for OAuth signature generation and credential validation:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+Tests are automatically run on every commit via GitHub Actions.
+
+### Testing in n8n
 
 Link the node to your local n8n installation:
 
