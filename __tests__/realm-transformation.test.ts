@@ -6,7 +6,7 @@
  */
 describe('Realm Hyphen to Underscore Transformation', () => {
 	/**
-	 * This simulates the transformation that happens in nodes/Netsuite/Netsuite.node.ts
+	 * This simulates the transformation that happens in nodes/NetsuiteRESTlet/Netsuite.node.ts
 	 * Line 114: const realm = (credentials.realm as string).replace(/-/g, '_');
 	 */
 	const transformRealm = (inputRealm: string): string => {

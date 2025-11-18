@@ -1,4 +1,4 @@
-import { NetsuiteRest } from '../nodes/NetsuiteRest/NetsuiteRest.node';
+import { NetsuiteRest } from '../nodes/NetsuiteRESTApi/NetsuiteRest.node';
 
 /**
  * Test suite for NetSuite REST API node
