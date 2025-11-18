@@ -285,7 +285,7 @@ export class NetsuiteRest implements INodeType {
 							queryParams.push('expandSubResources=true');
 						}
 						if (additionalOptions.fields) {
-							queryParams.push(`fields=${additionalOptions.fields}`);
+							queryParams.push(`fields=${encodeURIComponent(additionalOptions.fields)}`);
 						}
 						if (queryParams.length > 0) {
 							endpoint += `?${queryParams.join('&')}`;
@@ -376,11 +376,16 @@ export class NetsuiteRest implements INodeType {
 							q: suiteqlQuery,
 						};
 
+						// Add pagination as URL query parameters (NetSuite requirement)
+						const queryParams: string[] = [];
 						if (additionalOptions.limit) {
-							body.limit = additionalOptions.limit;
+							queryParams.push(`limit=${additionalOptions.limit}`);
 						}
 						if (additionalOptions.offset) {
-							body.offset = additionalOptions.offset;
+							queryParams.push(`offset=${additionalOptions.offset}`);
+						}
+						if (queryParams.length > 0) {
+							endpoint += `?${queryParams.join('&')}`;
 						}
 						break;
 					}
@@ -415,6 +420,7 @@ export class NetsuiteRest implements INodeType {
 						...authHeader,
 						'Content-Type': 'application/json',
 						'Accept': 'application/json',
+						'Prefer': 'transient',
 					},
 					uri: url,
 					json: true,
