@@ -180,8 +180,8 @@ describe('Realm Hyphen to Underscore Transformation', () => {
 
 	describe('Type safety', () => {
 		it('should handle string input', () => {
-			const input: string = '1234567-SB1';
-			const output: string = transformRealm(input);
+			const input = '1234567-SB1';
+			const output = transformRealm(input);
 
 			expect(typeof output).toBe('string');
 			expect(output).toBe('1234567_SB1');
