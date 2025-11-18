@@ -46,54 +46,36 @@ Before using this node, you need to set up OAuth1 (TBA) authentication in your N
 
 ### 3. Create a RESTlet Script
 
-Create a RESTlet script in NetSuite. Here's a simple example:
+Create a RESTlet script in NetSuite. This node uses POST-only requests (the standard NetSuite pattern). Here's a simple example:
 
 ```javascript
 /**
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define([], () => {
-    const get = (context) => {
-        return {
-            success: true,
-            message: 'GET request received',
-            data: context
-        };
-    };
-
+define(['N/log'], (log) => {
     const post = (context) => {
+        log.debug('Request received', context);
+
+        // Handle different actions based on request body
+        const action = context.action || 'unknown';
+
         return {
             success: true,
-            message: 'POST request received',
+            action: action,
+            message: `${action} request processed`,
             data: context
         };
     };
 
-    const put = (context) => {
-        return {
-            success: true,
-            message: 'PUT request received',
-            data: context
-        };
-    };
-
-    const _delete = (context) => {
-        return {
-            success: true,
-            message: 'DELETE request received',
-            data: context
-        };
-    };
-
+    // Only expose POST endpoint
     return {
-        get: get,
-        post: post,
-        put: put,
-        delete: _delete
+        post: post
     };
 });
 ```
+
+See `examples/sample-restlet.js` for a more complete example with CRUD operations.
 
 4. Deploy the script and note the **Script ID** and **Deploy ID**
 
@@ -117,30 +99,28 @@ When setting up the Netsuite OAuth1 API credentials in n8n, you'll need:
 
 ## Operations
 
-The node supports the following HTTP methods:
-
-- **GET**: Retrieve data from your RESTlet
-- **POST**: Send data to your RESTlet
-- **PUT**: Update data via your RESTlet
-- **DELETE**: Delete data via your RESTlet
+The node uses **POST** requests to communicate with your RESTlet, which is the standard pattern for NetSuite RESTlets. All data is sent in the request body as JSON.
 
 ## Usage
 
-### Additional Parameters
+### Request Body
 
-You can pass additional parameters to your RESTlet as JSON:
+All requests use POST and send data as JSON in the request body. Your RESTlet will receive this data and can determine what action to take.
 
-**For GET requests:** Parameters are sent as query string parameters
+**Example: Retrieve a customer**
 ```json
 {
+  "action": "get",
   "recordType": "customer",
   "id": "123"
 }
 ```
 
-**For POST/PUT requests:** Parameters are sent in the request body
+**Example: Create a record**
 ```json
 {
+  "action": "create",
+  "recordType": "customer",
   "name": "John Doe",
   "email": "john@example.com"
 }
@@ -150,9 +130,10 @@ You can pass additional parameters to your RESTlet as JSON:
 
 1. Add the **Netsuite RESTlet** node to your workflow
 2. Select or create **Netsuite OAuth1 API** credentials
-3. Choose an **Operation** (GET, POST, PUT, or DELETE)
-4. Add any **Additional Parameters** as needed
-5. Execute the workflow
+3. Enter your **Request Body** as JSON (e.g., `{"action": "get", "id": "123"}`)
+4. Execute the workflow
+
+The node will send a POST request with your data to your NetSuite RESTlet.
 
 ## Compatibility
 

@@ -7,7 +7,9 @@
 /**
  * Sample NetSuite RESTlet for use with n8n-nodes-netsuite-oauth1
  *
- * This is a basic example that demonstrates how to handle different HTTP methods.
+ * This is a POST-only RESTlet (the standard NetSuite pattern) that handles
+ * different operations based on the "action" field in the request body.
+ *
  * Customize this script based on your specific business requirements.
  *
  * To deploy:
@@ -21,181 +23,226 @@
 define(['N/record', 'N/search', 'N/log'], (record, search, log) => {
 
     /**
-     * Handles GET requests
-     * @param {Object} context - Request parameters
-     * @returns {Object} Response data
-     */
-    const get = (context) => {
-        try {
-            log.debug('GET Request', context);
-
-            // Example: Search for a record
-            if (context.recordType && context.id) {
-                const rec = record.load({
-                    type: context.recordType,
-                    id: context.id
-                });
-
-                return {
-                    success: true,
-                    data: {
-                        id: rec.id,
-                        type: rec.type,
-                        // Add more fields as needed
-                    }
-                };
-            }
-
-            return {
-                success: true,
-                message: 'GET request received',
-                data: context
-            };
-
-        } catch (e) {
-            log.error('GET Error', e);
-            return {
-                success: false,
-                error: e.message
-            };
-        }
-    };
-
-    /**
      * Handles POST requests
-     * @param {Object} context - Request body
+     * @param {Object} context - Request body containing action and parameters
      * @returns {Object} Response data
+     *
+     * Expected request format:
+     * {
+     *   "action": "get|create|update|delete|search",
+     *   "recordType": "customer",
+     *   "id": "123",  // for get, update, delete
+     *   "fields": {...}  // for create, update
+     * }
      */
     const post = (context) => {
         try {
             log.debug('POST Request', context);
 
-            // Example: Create a new record
-            if (context.recordType) {
-                const rec = record.create({
-                    type: context.recordType
-                });
+            const action = context.action || 'unknown';
 
-                // Set field values from context
-                Object.keys(context.fields || {}).forEach(fieldId => {
-                    rec.setValue({
-                        fieldId: fieldId,
-                        value: context.fields[fieldId]
-                    });
-                });
-
-                const recordId = rec.save();
-
-                return {
-                    success: true,
-                    message: 'Record created successfully',
-                    recordId: recordId
-                };
+            switch (action) {
+                case 'get':
+                    return handleGet(context);
+                case 'create':
+                    return handleCreate(context);
+                case 'update':
+                    return handleUpdate(context);
+                case 'delete':
+                    return handleDelete(context);
+                case 'search':
+                    return handleSearch(context);
+                default:
+                    return {
+                        success: false,
+                        error: `Unknown action: ${action}. Valid actions: get, create, update, delete, search`
+                    };
             }
-
-            return {
-                success: true,
-                message: 'POST request received',
-                data: context
-            };
 
         } catch (e) {
             log.error('POST Error', e);
             return {
                 success: false,
-                error: e.message
+                error: e.message,
+                stack: e.stack
             };
         }
     };
 
     /**
-     * Handles PUT requests
-     * @param {Object} context - Request body
-     * @returns {Object} Response data
+     * Get a record by ID
      */
-    const put = (context) => {
-        try {
-            log.debug('PUT Request', context);
-
-            // Example: Update an existing record
-            if (context.recordType && context.id) {
-                const rec = record.load({
-                    type: context.recordType,
-                    id: context.id
-                });
-
-                // Update field values from context
-                Object.keys(context.fields || {}).forEach(fieldId => {
-                    rec.setValue({
-                        fieldId: fieldId,
-                        value: context.fields[fieldId]
-                    });
-                });
-
-                rec.save();
-
-                return {
-                    success: true,
-                    message: 'Record updated successfully'
-                };
-            }
-
-            return {
-                success: true,
-                message: 'PUT request received',
-                data: context
-            };
-
-        } catch (e) {
-            log.error('PUT Error', e);
+    const handleGet = (context) => {
+        if (!context.recordType || !context.id) {
             return {
                 success: false,
-                error: e.message
+                error: 'recordType and id are required for get action'
             };
         }
+
+        const rec = record.load({
+            type: context.recordType,
+            id: context.id
+        });
+
+        // Get all field values
+        const data = {};
+        const fields = rec.getFields();
+        fields.forEach(fieldId => {
+            data[fieldId] = rec.getValue({ fieldId: fieldId });
+        });
+
+        return {
+            success: true,
+            action: 'get',
+            data: {
+                id: rec.id,
+                type: rec.type,
+                fields: data
+            }
+        };
     };
 
     /**
-     * Handles DELETE requests
-     * @param {Object} context - Request parameters
-     * @returns {Object} Response data
+     * Create a new record
      */
-    const _delete = (context) => {
-        try {
-            log.debug('DELETE Request', context);
-
-            // Example: Delete a record
-            if (context.recordType && context.id) {
-                record.delete({
-                    type: context.recordType,
-                    id: context.id
-                });
-
-                return {
-                    success: true,
-                    message: 'Record deleted successfully'
-                };
-            }
-
-            return {
-                success: true,
-                message: 'DELETE request received',
-                data: context
-            };
-
-        } catch (e) {
-            log.error('DELETE Error', e);
+    const handleCreate = (context) => {
+        if (!context.recordType) {
             return {
                 success: false,
-                error: e.message
+                error: 'recordType is required for create action'
             };
         }
+
+        const rec = record.create({
+            type: context.recordType
+        });
+
+        // Set field values from context
+        Object.keys(context.fields || {}).forEach(fieldId => {
+            rec.setValue({
+                fieldId: fieldId,
+                value: context.fields[fieldId]
+            });
+        });
+
+        const recordId = rec.save();
+
+        return {
+            success: true,
+            action: 'create',
+            message: 'Record created successfully',
+            recordId: recordId
+        };
     };
 
+    /**
+     * Update an existing record
+     */
+    const handleUpdate = (context) => {
+        if (!context.recordType || !context.id) {
+            return {
+                success: false,
+                error: 'recordType and id are required for update action'
+            };
+        }
+
+        const rec = record.load({
+            type: context.recordType,
+            id: context.id
+        });
+
+        // Update field values from context
+        Object.keys(context.fields || {}).forEach(fieldId => {
+            rec.setValue({
+                fieldId: fieldId,
+                value: context.fields[fieldId]
+            });
+        });
+
+        rec.save();
+
+        return {
+            success: true,
+            action: 'update',
+            message: 'Record updated successfully',
+            recordId: context.id
+        };
+    };
+
+    /**
+     * Delete a record
+     */
+    const handleDelete = (context) => {
+        if (!context.recordType || !context.id) {
+            return {
+                success: false,
+                error: 'recordType and id are required for delete action'
+            };
+        }
+
+        record.delete({
+            type: context.recordType,
+            id: context.id
+        });
+
+        return {
+            success: true,
+            action: 'delete',
+            message: 'Record deleted successfully',
+            recordId: context.id
+        };
+    };
+
+    /**
+     * Search for records
+     */
+    const handleSearch = (context) => {
+        if (!context.recordType) {
+            return {
+                success: false,
+                error: 'recordType is required for search action'
+            };
+        }
+
+        const searchObj = search.create({
+            type: context.recordType,
+            filters: context.filters || [],
+            columns: context.columns || []
+        });
+
+        const results = [];
+        const maxResults = context.maxResults || 1000;
+
+        searchObj.run().each((result) => {
+            if (results.length >= maxResults) {
+                return false;
+            }
+
+            const resultData = {
+                id: result.id,
+                type: result.recordType
+            };
+
+            // Add column values
+            result.columns.forEach(column => {
+                resultData[column.name] = result.getValue(column);
+            });
+
+            results.push(resultData);
+            return true;
+        });
+
+        return {
+            success: true,
+            action: 'search',
+            count: results.length,
+            data: results
+        };
+    };
+
+    // Only expose POST endpoint
     return {
-        get: get,
-        post: post,
-        put: put,
-        delete: _delete
+        post: post
     };
 });
