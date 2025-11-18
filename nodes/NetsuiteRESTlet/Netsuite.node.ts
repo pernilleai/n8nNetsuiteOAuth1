@@ -38,6 +38,12 @@ export class Netsuite implements INodeType {
 				placeholder: '{"action": "get", "recordType": "customer", "id": "123"}',
 				description: 'JSON data to send in the POST request body. Your RESTlet will receive this data.',
 			},
+			{
+				displayName: 'Created by pernille-ai.com',
+				name: 'attribution',
+				type: 'notice',
+				default: '',
+			},
 		],
 	};
 
