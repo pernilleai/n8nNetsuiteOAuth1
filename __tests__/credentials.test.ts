@@ -102,8 +102,9 @@ describe('NetSuite OAuth1 Credentials', () => {
 			expect(scriptIdField).toBeDefined();
 			expect(scriptIdField?.displayName).toBe('Script ID');
 			expect(scriptIdField?.type).toBe('string');
-			expect(scriptIdField?.required).toBe(true);
+			expect(scriptIdField?.required).toBe(false);
 			expect(scriptIdField?.placeholder).toBe('customscript_my_restlet');
+			expect(scriptIdField?.description).toContain('only required for Netsuite RESTlet node');
 		});
 
 		it('should have Deploy ID field', () => {
@@ -112,8 +113,9 @@ describe('NetSuite OAuth1 Credentials', () => {
 			expect(deployIdField).toBeDefined();
 			expect(deployIdField?.displayName).toBe('Deploy ID');
 			expect(deployIdField?.type).toBe('string');
-			expect(deployIdField?.required).toBe(true);
+			expect(deployIdField?.required).toBe(false);
 			expect(deployIdField?.placeholder).toBe('customdeploy_my_restlet');
+			expect(deployIdField?.description).toContain('only required for Netsuite RESTlet node');
 		});
 	});
 
