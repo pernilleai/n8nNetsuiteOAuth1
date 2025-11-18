@@ -39,8 +39,8 @@
       "dist/credentials/NetsuiteOAuth1Api.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Netsuite/Netsuite.node.js",
-      "dist/nodes/NetsuiteRest/NetsuiteRest.node.js"
+      "dist/nodes/NetsuiteRESTlet/Netsuite.node.js",
+      "dist/nodes/NetsuiteRESTApi/NetsuiteRest.node.js"
     ]
   },
   "devDependencies": {
