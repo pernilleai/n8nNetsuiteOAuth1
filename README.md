@@ -1,6 +1,9 @@
 # n8n-nodes-netsuite-oauth1
 
-This is an n8n community node that allows you to use Netsuite RESTlets with OAuth1 (Token-Based Authentication) in your n8n workflows.
+This is an n8n community node that provides two ways to integrate with NetSuite using OAuth1 (Token-Based Authentication):
+
+1. **Netsuite RESTlet** - For calling custom RESTlet scripts you deploy in NetSuite
+2. **Netsuite REST API** - For using NetSuite's built-in REST API with standard CRUD operations
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -336,14 +339,139 @@ You'll enter all of these values when configuring the **Netsuite OAuth1 API** cr
 
 ---
 
-## Operations
+## Using the Netsuite RESTlet Node
 
-The node uses **POST** requests to communicate with your RESTlet, which is the standard pattern for NetSuite RESTlets. All data is sent in the request body as JSON.
+The **Netsuite RESTlet** node uses **POST** requests to communicate with your custom RESTlet scripts. All data is sent in the request body as JSON.
 
 Your RESTlet receives the request body and can:
 - Parse the `action` field to determine what operation to perform
 - Access data fields like `recordType`, `id`, `fields`, etc.
 - Return a JSON response that n8n can use in subsequent nodes
+
+This is ideal for:
+- Custom business logic
+- Complex operations not supported by the REST API
+- Workflows requiring specific NetSuite customizations
+
+---
+
+## Using the Netsuite REST API Node
+
+The **Netsuite REST API** node provides direct access to NetSuite's built-in SuiteTalk REST Web Services. This node does **NOT** require deploying RESTlet scripts in NetSuite.
+
+### Available Operations
+
+1. **Get Record** - Retrieve a single record by internal ID
+2. **Create Record** - Create a new record
+3. **Update Record** - Update an existing record
+4. **Delete Record** - Delete a record
+5. **Upsert Record** - Create or update a record using an external ID
+6. **Search (SuiteQL)** - Query records using SQL-like syntax
+
+### Configuration in n8n
+
+1. Add the **Netsuite REST API** node to your workflow
+2. Select your **Netsuite OAuth1 API** credentials (same as RESTlet node)
+3. Choose an **Operation**
+4. Configure the operation-specific fields
+
+### Operation Examples
+
+#### Get Record
+Retrieve a customer record by ID:
+- **Operation**: Get Record
+- **Record Type**: `customer`
+- **Record ID**: `123`
+- **Additional Options**:
+  - Expand Sublists: Toggle to include sublist data
+  - Fields: Leave empty for all fields, or specify: `companyName,email,phone`
+
+#### Create Record
+Create a new customer:
+- **Operation**: Create Record
+- **Record Type**: `customer`
+- **Record Data**:
+```json
+{
+  "companyName": "Acme Corp",
+  "email": "contact@acme.com",
+  "phone": "555-1234"
+}
+```
+
+#### Update Record
+Update an existing customer:
+- **Operation**: Update Record
+- **Record Type**: `customer`
+- **Record ID**: `123`
+- **Record Data**:
+```json
+{
+  "email": "newemail@acme.com",
+  "phone": "555-5678"
+}
+```
+
+#### Delete Record
+Delete a record:
+- **Operation**: Delete Record
+- **Record Type**: `customer`
+- **Record ID**: `123`
+
+#### Upsert Record
+Create or update using external ID:
+- **Operation**: Upsert Record
+- **Record Type**: `customer`
+- **External ID Field**: `externalId`
+- **External ID Value**: `EXT-12345`
+- **Record Data**:
+```json
+{
+  "companyName": "Acme Corp",
+  "email": "contact@acme.com"
+}
+```
+
+If a record with `externalId = "EXT-12345"` exists, it will be updated. Otherwise, a new record is created.
+
+#### Search (SuiteQL)
+Query records using SuiteQL:
+- **Operation**: Search (SuiteQL)
+- **SuiteQL Query**:
+```sql
+SELECT id, companyname, email FROM customer WHERE email LIKE '%@acme.com' ORDER BY companyname
+```
+- **Additional Options**:
+  - Limit: `100`
+  - Offset: `0`
+
+### Common Record Types
+
+- `customer` - Customer records
+- `salesorder` - Sales orders
+- `invoice` - Invoices
+- `item` - Inventory items
+- `contact` - Contacts
+- `vendor` - Vendors
+- `employee` - Employees
+- `purchaseorder` - Purchase orders
+
+For a complete list, refer to the [NetSuite Records Browser](https://system.netsuite.com/help/helpcenter/en_US/srbrowser/Browser2023_1/schema/record/customer.html).
+
+### When to Use REST API vs RESTlet
+
+**Use the REST API Node when:**
+- Performing standard CRUD operations on NetSuite records
+- You need simple, direct access to NetSuite data
+- You don't want to deploy custom scripts in NetSuite
+- You're working with well-defined record types
+
+**Use the RESTlet Node when:**
+- Implementing custom business logic
+- Performing complex operations spanning multiple records
+- You need transaction-level control
+- The standard REST API doesn't support your use case
+- You have existing RESTlet scripts deployed
 
 ## Troubleshooting
 
