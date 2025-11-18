@@ -19,7 +19,7 @@ export class Netsuite implements INodeType {
 		subtitle: 'POST',
 		description: 'Interact with Netsuite RESTlets using OAuth1 (TBA)',
 		defaults: {
-			name: 'Netsuite',
+			name: 'Netsuite RESTlet',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
